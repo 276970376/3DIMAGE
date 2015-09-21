@@ -27,26 +27,30 @@ body {
 
 <script>
 	new Audio("http://276970376.github.io/mp3/seluyinyuehe.mp3").play();
-
+blagkmusic.play();
+blagkmusic.volume=0.3;
+blagkmusic.loop;
 </script>
-
-
-
 <script type="text/javascript" src="js/ge1doot.js"></script>
 <script type="text/javascript">
 
-
+"use strict";
+var stop=true;
 (function () {
-	/* ==== definitions ==== */
+	/* ==== 定义 ==== */
 	var diapo = [], layers = [], ctx, pointer, scr, camera, light, fps = 0, quality = [1,2],
-	// ---- poly constructor ----
+	
+	
+	
+	
+	// ---- 大量构造函数 ----
 	Poly = function (parent, face) {
 		this.parent = parent;
 		this.ctx    = ctx;
 		this.color  = face.fill || false;
 		this.points = [];
 		if (!face.img) {
-			// ---- create points ----
+			// ---- 创建点 ----
 			for (var i = 0; i < 4; i++) {
 				this.points[i] = new ge1doot.transform3D.Point(
 					parent.pc.x + (face.x[i] * parent.normalZ) + (face.z[i] * parent.normalX),
@@ -57,9 +61,11 @@ body {
 			this.points[3].next = false;
 		}
 	},
-	// ---- diapo constructor ----
+	
+	
+	// ---- diapo 函数 ----
 	Diapo = function (path, img, structure) {
-		// ---- create image ----
+		// ---- 创建图像 ----
 		this.img = new ge1doot.transform3D.Image(
 			this, path + img.img, 1, {
 				isLoaded: function(img) {
@@ -71,12 +77,12 @@ body {
 		this.visible  = false;
 		this.normalX  = img.nx;
 		this.normalZ  = img.nz;
-		// ---- point center ----
+		// ---- 中心点 ----
 		this.pc = new ge1doot.transform3D.Point(img.x, img.y, img.z);
-		// ---- target positions ----
+		// ---- 目标位置 ----
 		this.tx = img.x + (img.nx * Math.sqrt(camera.focalLength) * 20);
 		this.tz = img.z - (img.nz * Math.sqrt(camera.focalLength) * 20);
-		// ---- create polygons ----
+		// ---- 创建多边形 ----
 		this.poly = [];
 		for (var i = -1, p; p = structure[++i];) {
 			layers[i] = (p.img === true ? 1 : 2);
@@ -85,27 +91,32 @@ body {
 			);
 		}
 	},
-	// ---- init section ----
+	
+	
+	
+	// ---- 初始化 ----
 	init = function (json) {
 		// draw poly primitive
 		Poly.prototype.drawPoly = ge1doot.transform3D.drawPoly;
-		// ---- init screen ----
+		// ---- 初始屏幕 ----
 		scr = new ge1doot.Screen({
 			container: "canvas"
 		});
 		ctx = scr.ctx;
 		scr.resize();
-		// ---- init pointer ----
+		// ---- 初始化的指针 ----
 		pointer = new ge1doot.Pointer({
 			tap: function () {
 				if (camera.over) {
 					if (camera.over === camera.target.elem) {
-						// ---- return to the center ----
+						// ---- 回到中心 ----
 						camera.target.x = 0;
 						camera.target.z = 0;
 						camera.target.elem = false;
+						stop=true;
+							
 					} else {
-						// ---- goto diapo ----
+						// ---- 回到 diapo ----
 						camera.target.elem = camera.over;
 						camera.target.x = camera.over.tx;
 						camera.target.z = camera.over.tz;
@@ -116,12 +127,16 @@ body {
 							var dist = Math.sqrt(dx * dx + dz * dz);
 							var lev = (dist > 1500) ? quality[0] : quality[1];
 							d.img.setLevel(lev);
+						
+					
+							
 						}
 					}
 				}
 			}
 		});
-		// ---- init camera ----
+		
+		// ---- 初始化相机 ----
 		camera = new ge1doot.transform3D.Camera({
 			focalLength: Math.sqrt(scr.width) * 10,
 			easeTranslation: 0.025,
@@ -136,7 +151,7 @@ body {
 					this.target.ry = -pointer.Xi * 0.01;
 					this.target.rx = (pointer.Y - scr.height * 0.5) / (scr.height * 0.5);
 				} else {
-					if (this.target.elem) {
+					if (this.target.elem ) {
 						this.target.ry = Math.atan2(
 							this.target.elem.pc.x - this.x,
 							this.target.elem.pc.z - this.z
@@ -148,7 +163,7 @@ body {
 		});
 		camera.z  = -10000;
 		camera.py = 0;
-		// ---- create images ----
+		// ---- 创建图像 ----
 		for (var i = 0, img; img = json.imgdata[i++];) {
 			diapo.push(
 				new Diapo(
@@ -158,20 +173,23 @@ body {
 				)
 			);
 		}	
-		// ---- start engine ---- >>>
+		// ---- 启动引擎 ---- >>>
 		setInterval(function() {
 			quality = (fps > 50) ? [2,3] : [1,2];
 			fps = 0;
 		}, 1000);
 		run();
 	},
-	// ---- main loop ----
+	
+	
+	
+	// ---- 主循环 ----
 	run = function () {
-		// ---- clear screen ----
+		// ---- 清屏 ----
 		ctx.clearRect(0, 0, scr.width, scr.height);
-		// ---- camera ----
+		// ---- 相机 ----
 		camera.move();
-		// ---- draw layers ----
+		// ---- 绘制层 ----
 		for (var k = -1, l; l = layers[++k];) {
 			light = false;
 			for (var i = 0, d; d = diapo[i++];) {
@@ -179,30 +197,33 @@ body {
 				(d.visible && d.poly[k].draw());
 			}
 		}
-		// ---- cursor ----
+		// ---- 光标 ----
 		if (camera.over && !pointer.isDraging) {
 			scr.setCursor("pointer");
 		} else {
 			scr.setCursor("move");
 		}
-		// ---- loop ----
+		// ---- 循环 ----
 		fps++;
 		requestAnimFrame(run);
 	};
-	/* ==== prototypes ==== */
+	
+	
+	
+	/* ==== 原型 ==== */
 	Poly.prototype.draw = function () {
-		// ---- color light ----
+		// ---- 灯光颜色 ----
 		var c = this.color;
 		if (c.light || !light) {
 			var s = c.light ? this.parent.light : 1;
-			// ---- rgba color ----
+			// ---- rgba 颜色 ----
 			light = "rgba(" + 
 				Math.round(c.r * s) + "," +
 				Math.round(c.g * s) + "," + 
 				Math.round(c.b * s) + "," + (c.a || 1) + ")";
 			ctx.fillStyle = light;
 		}
-		// ---- paint poly ----
+		// ----涂料----
 		if (!c.light || this.parent.light < 1) {
 			// ---- projection ----
 			for (
@@ -213,9 +234,12 @@ body {
 			ctx.fill();
 		}
 	}
-	/* ==== image onload ==== */
+	
+	
+	
+	/* ==== 加载图像==== */
 	Diapo.prototype.loaded = function (img) {
-		// ---- create points ----
+		// ---- 创建点 ----
 		var d = [-1,1,1,-1,1,1,-1,-1];
 		var w = img.texture.width  * 0.5;
 		var h = img.texture.height * 0.5;
@@ -227,30 +251,78 @@ body {
 			);
 		}
 	}
-	/* ==== images draw ==== */
+	
+	
+	
+	/* ==== 绘制图像 ==== */
+
 	Diapo.prototype.draw = function () {
-		// ---- visibility ----
+	
+		// ---- 可见度 ----
 		this.pc.projection();
 		if (this.pc.Z > -(camera.focalLength >> 1) && this.img.transform3D(true)) {
 			// ---- light ----
 			this.light = 0.5 + Math.abs(this.normalZ * camera.cosY - this.normalX * camera.sinY) * 0.6;
-			// ---- draw image ----
+			// ---- 画图像 ----
 			this.visible = true;
 			this.img.draw();
-			// ---- test pointer inside ----
+			
+			
+			// ---- 内部测试指针 ----
 			if (pointer.hasMoved || pointer.isDown) {
-				if (
-					this.img.isPointerInside(
-						pointer.X,
-						pointer.Y
-					)
-				) camera.over = this;
+				if (this.img.isPointerInside(pointer.X,pointer.Y)) 
+				
+						{
+						
+				if (stop && pointer.isDown ){
+				var str = this.img.texture.src;
+					
+				var spstr = str.split("/");
+				var spstr = spstr[spstr.length-1].split(".");
+				var jieshao={};
+			         
+					 jieshao[1]="这是一张我和弟弟小时候的照片也不知当时几岁了可爱吧！猜猜哪个是我？";
+					 jieshao[2]="当然是我了！小时候可爱吧！";
+					 jieshao[3]="这是一张我和弟弟小时候的照片同样也不知当时几岁了可爱吧！猜猜哪个是我";
+					 jieshao[4]="这是一张我和弟弟小时候半岁的照片可爱吧！";
+					 jieshao[5]="初中时候在超市买东西的照片！ ";
+					 jieshao[6]="大学时云台山的一张照片";
+					 jieshao[7]="南昌工作时的照片";
+					 jieshao[8]="忽如一夜春风来,千树万树梨花开";
+					 jieshao[9]="少林寺威武小朋友们可爱！旁边的是游客的宝宝";
+					 jieshao[10]="少林寺的平安钟！我在钟下保平安！";
+					 jieshao[11]="南阳农名运动会彩排！好辛苦哦！";
+					 jieshao[12]="南阳农名运动会我在最高层拍摄！很冷啊！高处不胜寒！";
+					new Audio("http://tts.baidu.com/text2audio?lan=zh&pid=101&ie=UTF-8&text="+jieshao[parseInt(spstr[0])]+"&spd=3").play();
+			
+			//alert(spstr[spstr.length-1]+".wav");
+				//new Audio(str+".wav").play();
+				stop=false;
+				//new Audio(spstr[spstr.length-1]+".wav").play();
+				//alert("你点击了:"+spstr[spstr.length-1]);
+				} 
+
+			
+						camera.over = this;
+						
+						}
 			}
-		} else this.visible = false;
+		} else 
+			{		
+				this.visible = false;
+							//for(var s in this.img)
+							//alert(this.img[s]);
+			}	
+	
+							
+		
 		return true;
 	}
+	
+	
+	
 	return {
-		// --- load data ----
+		// --- 装载数据 ----
 		load : function (data) {
 			window.addEventListener('load', function () {
 				ge1doot.loadJS(
